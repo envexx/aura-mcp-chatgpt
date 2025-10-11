@@ -1,7 +1,18 @@
 {
-  "name": "Aura AI Trading Assistant MCP",
-  "description": "Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments",
-  "version": "1.0.0",
+  "info": {
+    "title": "Aura AI Trading Assistant MCP",
+    "description": "Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Aura MCP Support",
+      "url": "https://aura-mcp-chatgpt.vercel.app",
+      "email": "support@auramcp.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
   "servers": [
     {
       "url": "https://aura-mcp-chatgpt.vercel.app",
