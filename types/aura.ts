@@ -1,21 +1,27 @@
-export interface AuraToken {
+export interface PortfolioToken {
+  address: string;
   symbol: string;
-  balance: string;
-  usdValue: string;
-  token: string;
-  decimals: number;
-  price: number;
+  network: string;
+  balance: number;
+  balanceUSD: number;
 }
 
-export interface NetworkData {
-  tokens: AuraToken[];
-  totalValue: string;
+export interface PortfolioNetworkInfo {
+  name: string;
+  chainId: string;
+  platformId: string;
+  explorerUrl: string;
+  iconUrls: string[];
+}
+
+export interface NetworkPortfolio {
+  network: PortfolioNetworkInfo;
+  tokens: PortfolioToken[];
 }
 
 export interface AuraPortfolioResponse {
-  portfolio: {
-    [network: string]: NetworkData;
-  };
+  address: string;
+  portfolio: NetworkPortfolio[];
   cached: boolean;
   version: string;
 }
@@ -34,6 +40,15 @@ export interface RiskAnalysis {
     symbol: string;
     percentage: number;
   };
+}
+
+export interface AuraToken {
+  symbol: string;
+  balance: number;
+  usdValue: string;
+  token: string;
+  decimals: number;
+  price: number;
 }
 
 export interface NetworkAssets {
