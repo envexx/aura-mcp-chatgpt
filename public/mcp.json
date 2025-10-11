@@ -13,17 +13,111 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "servers": [
-    {
-      "url": "https://aura-mcp-chatgpt.vercel.app",
-      "description": "Production server"
-    },
-    {
-      "url": "http://localhost:3000",
-      "description": "Development server"
+  "servers": {
+    "production": {
+      "url": "https://aura-mcp-chatgpt.vercel.app"
     }
-  ],
-  "privacyPolicy": "https://aura-mcp-chatgpt.vercel.app/api/privacy-policy",
+  },
+  "paths": {
+    "/api/asset": {
+      "get": {
+        "summary": "Get Portfolio Analytics",
+        "operationId": "getPortfolio",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "address": { "type": "string" }
+          },
+          "required": ["address"]
+        }
+      }
+    },
+    "/api/strategies": {
+      "get": {
+        "summary": "Get Trading Strategies",
+        "operationId": "getStrategies",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "address": { "type": "string" }
+          },
+          "required": ["address"]
+        }
+      }
+    },
+    "/api/chat": {
+      "post": {
+        "summary": "Chat Assistant",
+        "operationId": "chatAssistant",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "address": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "required": ["address"]
+        }
+      }
+    },
+    "/api/trade": {
+      "post": {
+        "summary": "Execute Trade",
+        "operationId": "executeTrade",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "address": { "type": "string" },
+            "fromToken": { "type": "string" },
+            "toToken": { "type": "string" },
+            "amount": { "type": "string" },
+            "slippage": { "type": "number" },
+            "automationRules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": { "enum": ["PRICE_TARGET", "STOP_LOSS", "TAKE_PROFIT"] },
+                  "targetPrice": { "type": "number" },
+                  "percentage": { "type": "number" },
+                  "action": { "enum": ["BUY", "SELL"] }
+                }
+              }
+            }
+          },
+          "required": ["address", "fromToken", "toToken", "amount"]
+        }
+      }
+    },
+    "/api/privacy-policy": {
+      "get": {
+        "summary": "Get Privacy Policy",
+        "operationId": "getPrivacyPolicy",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "version": { "type": "string" },
+                        "lastUpdated": { "type": "string" },
+                        "policyDetails": { "type": "object" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "tools": [
     {
       "name": "aura.getPortfolio",
