@@ -1,5 +1,28 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
+import { Strategy, StrategyAction } from '../../types/strategies';
+
+interface FormattedStrategy {
+  name: string;
+  risk: 'low' | 'medium' | 'high';
+  description: string;
+  actions: {
+    type: string;
+    platform: string;
+    network: string;
+    token: string;
+    estimatedApy: number;
+    requirements: string[];
+    steps: string[];
+  }[];
+  timeframe: string;
+  confidence: string;
+  potentialReturn: {
+    min: number;
+    max: number;
+    timeframe: string;
+  };
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,11 +47,11 @@ export default async function handler(
     const strategies = auraResponse.data;
 
     // Format and enhance the strategies data
-    const formattedStrategies = strategies.strategies.map((strategy: any) => ({
+    const formattedStrategies: FormattedStrategy[] = strategies.strategies.map((strategy: Strategy) => ({
       name: strategy.name,
       risk: strategy.risk,
       description: strategy.description,
-      actions: strategy.actions.map((action: any) => ({
+      actions: strategy.actions.map((action: StrategyAction) => ({
         type: action.type,
         platform: action.platform,
         network: action.network,
@@ -50,12 +73,16 @@ export default async function handler(
     const analysis = {
       totalStrategies: formattedStrategies.length,
       riskDistribution: {
-        low: formattedStrategies.filter(s => s.risk === 'low').length,
-        medium: formattedStrategies.filter(s => s.risk === 'medium').length,
-        high: formattedStrategies.filter(s => s.risk === 'high').length
+        low: formattedStrategies.filter((s: FormattedStrategy) => s.risk === 'low').length,
+        medium: formattedStrategies.filter((s: FormattedStrategy) => s.risk === 'medium').length,
+        high: formattedStrategies.filter((s: FormattedStrategy) => s.risk === 'high').length
       },
-      platforms: [...new Set(formattedStrategies.flatMap(s => s.actions.map(a => a.platform)))],
-      networks: [...new Set(formattedStrategies.flatMap(s => s.actions.map(a => a.network)))]
+      platforms: Array.from(new Set(formattedStrategies.flatMap((s: FormattedStrategy) => 
+        s.actions.map((a: StrategyAction) => a.platform)
+      ))),
+      networks: Array.from(new Set(formattedStrategies.flatMap((s: FormattedStrategy) => 
+        s.actions.map((a: StrategyAction) => a.network)
+      )))
     };
 
     res.status(200).json({
