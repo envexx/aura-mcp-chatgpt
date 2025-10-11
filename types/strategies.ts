@@ -1,39 +1,39 @@
-export interface Strategy {
-  name: string;
-  risk: 'low' | 'medium' | 'high';
-  description: string;
-  actions: StrategyAction[];
-  timeframe: string;
-  confidence: string;
-  potentialReturn: {
-    min: number;
-    max: number;
-    timeframe: string;
-  };
-}
+import { NetworkPortfolio } from './aura';
 
-export interface StrategyAction {
-  type: string;
-  platform: string;
-  network: string;
-  token: string;
-  estimatedApy: number;
-  requirements: string[];
-  steps: string[];
-}
-
-export interface StrategyAnalysis {
-  totalStrategies: number;
-  riskDistribution: {
-    low: number;
-    medium: number;
-    high: number;
-  };
-  platforms: string[];
-  networks: string[];
-}
-
-export interface StrategiesResponse {
+export interface PortfolioStrategiesResponse {
+  address: string;
+  portfolio: NetworkPortfolio[];
   strategies: Strategy[];
-  analysis: StrategyAnalysis;
+  cached: boolean;
+  version: string;
+}
+
+export interface Strategy {
+  llm: {
+    provider: string;
+    model: string;
+  };
+  response: StrategyResponse[];
+  responseTime: number;
+  error: string | null;
+}
+
+export interface StrategyResponse {
+  name: string;
+  risk: string;
+  actions: Action[];
+}
+
+export interface Action {
+  tokens: string;
+  description: string;
+  platforms: Platform[];
+  networks: string[];
+  operations: string[];
+  apy: string;
+}
+
+export interface Platform {
+  name: string;
+  url: string;
 }
