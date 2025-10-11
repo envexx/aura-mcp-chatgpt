@@ -33,57 +33,115 @@
     "/api/strategies": {
       "get": {
         "summary": "Get Trading Strategies",
+        "description": "Get AI-powered trading strategies and recommendations",
         "operationId": "getStrategies",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "address": { "type": "string" }
-          },
-          "required": ["address"]
-        }
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "description": "Wallet address to analyze",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "deprecated": false
       }
     },
     "/api/chat": {
       "post": {
         "summary": "Chat Assistant",
+        "description": "Interactive AI assistant for portfolio analysis and strategy advice",
         "operationId": "chatAssistant",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "address": { "type": "string" },
-            "message": { "type": "string" }
-          },
-          "required": ["address"]
-        }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "description": "Wallet address"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "User message"
+                  }
+                },
+                "required": ["address"]
+              }
+            }
+          }
+        },
+        "deprecated": false
       }
     },
     "/api/trade": {
       "post": {
         "summary": "Execute Trade",
+        "description": "Execute trades with automation rules and smart order routing",
         "operationId": "executeTrade",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "address": { "type": "string" },
-            "fromToken": { "type": "string" },
-            "toToken": { "type": "string" },
-            "amount": { "type": "string" },
-            "slippage": { "type": "number" },
-            "automationRules": {
-              "type": "array",
-              "items": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
                 "type": "object",
                 "properties": {
-                  "type": { "enum": ["PRICE_TARGET", "STOP_LOSS", "TAKE_PROFIT"] },
-                  "targetPrice": { "type": "number" },
-                  "percentage": { "type": "number" },
-                  "action": { "enum": ["BUY", "SELL"] }
-                }
+                  "address": {
+                    "type": "string",
+                    "description": "Wallet address"
+                  },
+                  "fromToken": {
+                    "type": "string",
+                    "description": "Token to sell"
+                  },
+                  "toToken": {
+                    "type": "string",
+                    "description": "Token to buy"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Amount to trade"
+                  },
+                  "slippage": {
+                    "type": "number",
+                    "description": "Allowed slippage percentage"
+                  },
+                  "automationRules": {
+                    "type": "array",
+                    "description": "Automated trading rules",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["PRICE_TARGET", "STOP_LOSS", "TAKE_PROFIT"]
+                        },
+                        "targetPrice": {
+                          "type": "number",
+                          "description": "Target price for the rule"
+                        },
+                        "percentage": {
+                          "type": "number",
+                          "description": "Percentage for the rule"
+                        },
+                        "action": {
+                          "type": "string",
+                          "enum": ["BUY", "SELL"]
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": ["address", "fromToken", "toToken", "amount"]
               }
             }
-          },
-          "required": ["address", "fromToken", "toToken", "amount"]
-        }
+          }
+        },
+        "deprecated": false
       }
     },
     "/api/privacy-policy": {
