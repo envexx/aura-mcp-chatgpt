@@ -1,0 +1,104 @@
+{
+  "name": "Aura AI Trading Assistant MCP",
+  "description": "Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "aura.getPortfolio",
+      "description": "Get detailed portfolio analytics with AI insights",
+      "endpoint": "/api/asset",
+      "method": "GET",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" }
+        },
+        "required": ["address"]
+      },
+      "pricing": {
+        "amount": 0.001,
+        "token": "USDC"
+      }
+    },
+    {
+      "name": "aura.getStrategies",
+      "description": "Get AI-powered trading strategies and recommendations",
+      "endpoint": "/api/strategies",
+      "method": "GET",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" }
+        },
+        "required": ["address"]
+      },
+      "pricing": {
+        "amount": 0.002,
+        "token": "USDC"
+      }
+    },
+    {
+      "name": "aura.chatAssistant",
+      "description": "Interactive AI assistant for portfolio analysis and strategy advice",
+      "endpoint": "/api/chat",
+      "method": "POST",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "message": { "type": "string" }
+        },
+        "required": ["address"]
+      },
+      "pricing": {
+        "amount": 0.002,
+        "token": "USDC"
+      }
+    },
+    {
+      "name": "aura.executeTrade",
+      "description": "Execute trades with automation rules and smart order routing",
+      "endpoint": "/api/trade",
+      "method": "POST",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "fromToken": { "type": "string" },
+          "toToken": { "type": "string" },
+          "amount": { "type": "string" },
+          "slippage": { "type": "number" },
+          "automationRules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "enum": ["PRICE_TARGET", "STOP_LOSS", "TAKE_PROFIT"] },
+                "targetPrice": { "type": "number" },
+                "percentage": { "type": "number" },
+                "action": { "enum": ["BUY", "SELL"] }
+              }
+            }
+          }
+        },
+        "required": ["address", "fromToken", "toToken", "amount"]
+      },
+      "pricing": {
+        "amount": 0.005,
+        "token": "USDC"
+      }
+    }
+  ],
+  "features": {
+    "x402Integration": true,
+    "automatedTrading": true,
+    "aiPowered": true
+  },
+  "supportedNetworks": [
+    "ethereum",
+    "polygon",
+    "optimism",
+    "arbitrum",
+    "base"
+  ]
+}
