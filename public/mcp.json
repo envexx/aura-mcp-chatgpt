@@ -2,6 +2,7 @@
   "name": "Aura AI Trading Assistant MCP",
   "description": "Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments",
   "version": "1.0.0",
+  "privacyPolicy": "https://aura-mcp-chatgpt.vercel.app/api/privacy-policy",
   "tools": [
     {
       "name": "aura.getPortfolio",
@@ -100,5 +101,35 @@
     "optimism",
     "arbitrum",
     "base"
-  ]
+  ],
+  "actions": {
+    "getPrivacyPolicy": {
+      "name": "Get Privacy Policy",
+      "description": "Retrieve the detailed privacy policy for AURA MCP",
+      "endpoint": "/api/privacy-policy",
+      "method": "GET",
+      "response": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "string"
+              },
+              "lastUpdated": {
+                "type": "string"
+              },
+              "policyDetails": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
