@@ -1,212 +1,184 @@
+import { Home, Database, MessageSquare, TrendingUp, Shield, Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import type { Strategy, StrategiesResponse } from '../types/strategies';
 
-export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'strategies' | 'chat'>('portfolio');
-  const [portfolioData, setPortfolioData] = useState<any>(null);
-  const [strategiesData, setStrategiesData] = useState<StrategiesResponse | null>(null);
-  const [chatMessage, setChatMessage] = useState('');
-  const [chatResponse, setChatResponse] = useState<string | null>(null);
-
-  const { address, isConnected } = useAccount();
-  const { connect } = useConnect({
-    connector: new MetaMaskConnector(),
-  });
-  const { disconnect } = useDisconnect();
-
-  const handleGetPortfolio = async () => {
-    if (!address) return;
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/asset?address=${address}`);
-      const data = await response.json();
-      setPortfolioData(data);
-    } catch (error) {
-      console.error('Error fetching portfolio:', error);
-    }
-    setLoading(false);
-  };
-
-  const handleGetStrategies = async () => {
-    if (!address) return;
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/strategies?address=${address}`);
-      const data = await response.json();
-      setStrategiesData(data.data);
-    } catch (error) {
-      console.error('Error fetching strategies:', error);
-    }
-    setLoading(false);
-  };
-
-  const handleChatSubmit = async () => {
-    if (!address) return;
-    setLoading(true);
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          address,
-          message: chatMessage
-        })
-      });
-      const data = await response.json();
-      setChatResponse(data.chatAnswer);
-    } catch (error) {
-      console.error('Error getting chat response:', error);
-    }
-    setLoading(false);
-  };
+export default function Documentation() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          AURA MCP Dashboard
-        </h1>
-
-        <div className="bg-white shadow rounded-lg p-6 mb-8">
-          {!isConnected ? (
-            <button
-              onClick={() => connect()}
-              className="w-full bg-blue-600 text-white rounded px-4 py-2"
-            >
-              Connect Wallet
-            </button>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <p>Connected: {address}</p>
-                <button
-                  onClick={() => disconnect()}
-                  className="bg-red-600 text-white rounded px-4 py-2"
-                >
-                  Disconnect
-                </button>
-              </div>
-
-              <div className="flex space-x-4 border-b">
-                <button
-                  className={`py-2 px-4 ${activeTab === 'portfolio' ? 'border-b-2 border-blue-500' : ''}`}
-                  onClick={() => {
-                    setActiveTab('portfolio');
-                    handleGetPortfolio();
-                  }}
-                >
-                  Portfolio
-                </button>
-                <button
-                  className={`py-2 px-4 ${activeTab === 'strategies' ? 'border-b-2 border-blue-500' : ''}`}
-                  onClick={() => {
-                    setActiveTab('strategies');
-                    handleGetStrategies();
-                  }}
-                >
-                  Strategies
-                </button>
-                <button
-                  className={`py-2 px-4 ${activeTab === 'chat' ? 'border-b-2 border-blue-500' : ''}`}
-                  onClick={() => setActiveTab('chat')}
-                >
-                  AI Chat
-                </button>
-              </div>
-
-              {loading && (
-                <div className="text-center py-4">Loading...</div>
-              )}
-
-              {activeTab === 'portfolio' && portfolioData && (
-                <div className="space-y-6">
-                  <div className="bg-gray-50 p-4 rounded">
-                    <h2 className="text-xl font-semibold mb-4">Portfolio Overview</h2>
-                    <p>Total Value: ${(portfolioData?.data?.totalPortfolioValue || 0).toFixed(2)}</p>
-                    
-                    <h3 className="text-lg font-semibold mt-4 mb-2">Top Holdings</h3>
-                    <div className="space-y-2">
-                      {portfolioData?.data?.topHoldings?.map((holding: any) => {
-                        const totalValue = typeof holding?.totalValue === 'number' ? holding.totalValue : 0;
-                        const percentage = typeof holding?.percentage === 'number' ? holding.percentage : 0;
-                        return (
-                          <div key={holding?.symbol || 'unknown'} className="flex justify-between">
-                            <span>{holding?.symbol || 'Unknown'}</span>
-                            <span>${totalValue.toFixed(2)} ({percentage.toFixed(2)}%)</span>
-                          </div>
-                        );
-                      }) || <p>No holdings data available</p>}
-                    </div>
-
-                    <h3 className="text-lg font-semibold mt-4 mb-2">Risk Analysis</h3>
-                    <div className="space-y-2">
-                      <p>Diversification Score: {portfolioData?.data?.riskAnalysis?.diversificationScore || 0}/100</p>
-                      <p>Stablecoin Percentage: {(portfolioData?.data?.riskAnalysis?.stablecoinPercentage || 0).toFixed(2)}%</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'strategies' && (
-                <div className="space-y-6">
-                  <div className="bg-gray-50 p-4 rounded">
-                    <h2 className="text-xl font-semibold mb-4">Strategy Analysis</h2>
-                    <p>Total Strategies: {strategiesData?.analysis?.totalStrategies || 0}</p>
-                    
-                    <h3 className="text-lg font-semibold mt-4 mb-2">Risk Distribution</h3>
-                    <div className="space-y-2">
-                      <p>Low Risk: {strategiesData?.analysis?.riskDistribution?.low || 0}</p>
-                      <p>Medium Risk: {strategiesData?.analysis?.riskDistribution?.medium || 0}</p>
-                      <p>High Risk: {strategiesData?.analysis?.riskDistribution?.high || 0}</p>
-                    </div>
-
-                    <h3 className="text-lg font-semibold mt-4 mb-2">Available Strategies</h3>
-                    <div className="space-y-4">
-                      {strategiesData?.strategies?.map((strategy: Strategy, index: number) => (
-                        <div key={index} className="border p-4 rounded">
-                          <h4 className="font-semibold">{strategy?.name || 'Unnamed Strategy'}</h4>
-                          <p className="text-sm text-gray-600">{strategy?.description || 'No description available'}</p>
-                          <p className="text-sm mt-2">Risk: {strategy?.risk || 'Unknown'}</p>
-                          <p className="text-sm">Potential Return: {strategy?.potentialReturn?.min || 0}% - {strategy?.potentialReturn?.max || 0}%</p>
-                        </div>
-                      )) || <p>No strategies available</p>}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'chat' && (
-                <div className="space-y-4">
-                  <textarea
-                    value={chatMessage}
-                    onChange={(e) => setChatMessage(e.target.value)}
-                    placeholder="Ask about your portfolio or strategies..."
-                    className="w-full p-2 border rounded"
-                    rows={3}
-                  />
-
-                  <button
-                    onClick={handleChatSubmit}
-                    disabled={loading}
-                    className="w-full bg-green-600 text-white rounded px-4 py-2 disabled:opacity-50"
-                  >
-                    Get AI Analysis
-                  </button>
-
-                  {chatResponse && (
-                    <div className="bg-gray-50 p-4 rounded">
-                      <h3 className="text-lg font-semibold mb-2">AI Response:</h3>
-                      <p className="whitespace-pre-wrap">{chatResponse}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+    <div className="min-h-screen bg-white text-gray-900 font-sans">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <h1 className="text-xl font-semibold text-gray-900">AURA MCP API Documentation</h1>
         </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+        >
+          {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className={`w-64 bg-gray-50 border-r border-gray-200 p-6 fixed inset-y-0 left-0 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:inset-0 transition-transform duration-200 ease-in-out z-30`}>
+          <nav className="mt-8">
+            <ul className="space-y-2">
+              <li>
+                <a href="#introduction" className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900" onClick={() => setSidebarOpen(false)}>
+                  <Home className="mr-3 h-5 w-5" />
+                  Introduction
+                </a>
+              </li>
+              <li>
+                <a href="#asset" className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900" onClick={() => setSidebarOpen(false)}>
+                  <Database className="mr-3 h-5 w-5" />
+                  Portfolio Analytics
+                </a>
+              </li>
+              <li>
+                <a href="#strategies" className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900" onClick={() => setSidebarOpen(false)}>
+                  <TrendingUp className="mr-3 h-5 w-5" />
+                  Trading Strategies
+                </a>
+              </li>
+              <li>
+                <a href="#chat" className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900" onClick={() => setSidebarOpen(false)}>
+                  <MessageSquare className="mr-3 h-5 w-5" />
+                  Chat Assistant
+                </a>
+              </li>
+              <li>
+                <a href="#trade" className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900" onClick={() => setSidebarOpen(false)}>
+                  <TrendingUp className="mr-3 h-5 w-5" />
+                  Execute Trade
+                </a>
+              </li>
+              <li>
+                <a href="#privacy-policy" className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 hover:text-gray-900" onClick={() => setSidebarOpen(false)}>
+                  <Shield className="mr-3 h-5 w-5" />
+                  Privacy Policy
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+
+        {/* Overlay for mobile */}
+        {sidebarOpen && <div className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
+
+        {/* Main Content */}
+        <main className="flex-1 md:ml-0 p-8 overflow-y-auto">
+          <div className="max-w-4xl mx-auto">
+            <section id="introduction" className="mb-16">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6">Aura AI Trading Assistant MCP</h1>
+              <p className="text-lg text-gray-700 mb-4">
+                Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments.
+              </p>
+              <p className="text-lg text-gray-700">
+                This API provides endpoints for portfolio analytics, trading strategies, AI chat assistance, trade execution, and privacy policy access.
+              </p>
+            </section>
+
+            <section id="asset" className="mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">GET /api/asset - Portfolio Analytics</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                Get detailed portfolio analytics with AI insights.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Parameters</h3>
+              <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">address</code> (query, required): Wallet address to analyze (string)</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Example Request</h3>
+              <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-800 overflow-x-auto">
+                <code>GET /api/asset?address=0x1234567890abcdef</code>
+              </pre>
+            </section>
+
+            <section id="strategies" className="mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">GET /api/strategies - Trading Strategies</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                Get AI-powered trading strategies and recommendations.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Parameters</h3>
+              <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">address</code> (query, required): Wallet address to analyze (string)</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Example Request</h3>
+              <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-800 overflow-x-auto">
+                <code>GET /api/strategies?address=0x1234567890abcdef</code>
+              </pre>
+            </section>
+
+            <section id="chat" className="mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">POST /api/chat - Chat Assistant</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                Interactive AI assistant for portfolio analysis and strategy advice.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Request Body</h3>
+              <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">address</code> (optional): Wallet address (string)</li>
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">message</code> (optional): User message (string)</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Example Request</h3>
+              <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-800 overflow-x-auto">
+                <code>POST /api/chat
+Content-Type: application/json
+
+{`{
+  "address": "0x1234567890abcdef",
+  "message": "What is my portfolio value?"
+}`}</code>
+              </pre>
+            </section>
+
+            <section id="trade" className="mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">POST /api/trade - Execute Trade</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                Execute trades with automation rules and smart order routing.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Request Body</h3>
+              <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">address</code> (required): Wallet address (string)</li>
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">fromToken</code> (required): Token to sell (string)</li>
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">toToken</code> (required): Token to buy (string)</li>
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">amount</code> (required): Amount to trade (string)</li>
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">slippage</code> (optional): Allowed slippage percentage (number)</li>
+                <li><code className="bg-gray-100 px-2 py-1 rounded text-sm">automationRules</code> (optional): Automated trading rules (array of objects)</li>
+              </ul>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Example Request</h3>
+              <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-800 overflow-x-auto">
+                <code>POST /api/trade
+Content-Type: application/json
+
+{`{
+  "address": "0x1234567890abcdef",
+  "fromToken": "ETH",
+  "toToken": "USDC",
+  "amount": "1.0"
+}`}</code>
+              </pre>
+            </section>
+
+            <section id="privacy-policy" className="mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">GET /api/privacy-policy - Privacy Policy</h2>
+              <p className="text-lg text-gray-700 mb-6">
+                Get the privacy policy details.
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Response</h3>
+              <pre className="bg-gray-100 p-4 rounded-lg text-sm text-gray-800 overflow-x-auto">
+                <code>{`{
+  "success": true,
+  "data": {
+    "version": "1.0",
+    "lastUpdated": "2023-10-01",
+    "policyDetails": {}
+  }
+}`}</code>
+              </pre>
+            </section>
+          </div>
+        </main>
       </div>
     </div>
   );
