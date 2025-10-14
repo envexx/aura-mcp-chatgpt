@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Aura AI Trading Assistant MCP",
-    "description": "Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments",
+    "description": "Advanced MCP server with fully automated trading execution, AI-powered portfolio analysis, and smart Uniswap integration with x402 micropayments",
     "version": "1.0.0",
     "x-payment": {
       "provider": "x402",
@@ -21,7 +21,7 @@
     "/api/asset": {
       "get": {
         "summary": "Get Portfolio Analytics",
-        "description": "Get detailed portfolio analytics with AI insights (Requires 0.001 USDC payment)",
+        "description": "Get detailed portfolio analytics with AI insights (FREE)",
         "operationId": "getPortfolio",
         "parameters": [
           {
@@ -34,38 +34,9 @@
             }
           }
         ],
-        "x-payment-required": {
-          "amount": 0.001,
-          "currency": "USDC",
-          "service": "portfolio_analysis",
-          "description": "Premium AI-powered portfolio analysis"
-        },
         "responses": {
           "200": {
             "description": "Portfolio analysis data"
-          },
-          "402": {
-            "description": "Payment Required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": { "type": "string" },
-                    "payment": {
-                      "type": "object",
-                      "properties": {
-                        "paymentId": { "type": "string" },
-                        "qrCode": { "type": "string" },
-                        "paymentUrl": { "type": "string" },
-                        "amount": { "type": "number" },
-                        "currency": { "type": "string" }
-                      }
-                    }
-                  }
-                }
-              }
-            }
           }
         },
         "deprecated": false
@@ -74,7 +45,7 @@
     "/api/strategies": {
       "get": {
         "summary": "Get Trading Strategies",
-        "description": "Get AI-powered trading strategies and recommendations (Requires 0.002 USDC payment)",
+        "description": "Get AI-powered trading strategies and recommendations (FREE)",
         "operationId": "getStrategies",
         "parameters": [
           {
@@ -87,18 +58,9 @@
             }
           }
         ],
-        "x-payment-required": {
-          "amount": 0.002,
-          "currency": "USDC",
-          "service": "strategy_recommendations",
-          "description": "AI-powered investment strategy recommendations"
-        },
         "responses": {
           "200": {
             "description": "Strategy recommendations"
-          },
-          "402": {
-            "description": "Payment Required - 0.002 USDC for strategy recommendations"
           }
         },
         "deprecated": false
@@ -136,14 +98,8 @@
     "/api/trade": {
       "post": {
         "summary": "Execute Trade",
-        "description": "Execute trades with automation rules and smart order routing (Requires 0.005 USDC payment)",
+        "description": "Execute trades with automation rules and smart order routing (FREE)",
         "operationId": "executeTrade",
-        "x-payment-required": {
-          "amount": 0.005,
-          "currency": "USDC",
-          "service": "trade_execution",
-          "description": "Automated trade execution with smart routing"
-        },
         "requestBody": {
           "required": true,
           "content": {
@@ -384,7 +340,7 @@
     "/api/swap/quote": {
       "post": {
         "summary": "Get Swap Quote",
-        "description": "Get optimal swap quote from Uniswap MCP with MEV protection (Requires 0.005 USDC payment)",
+        "description": "Get comprehensive Uniswap swap quote with detailed analysis, price impact warnings, and route optimization (Requires 0.005 USDC payment)",
         "operationId": "getSwapQuote",
         "x-payment-required": {
           "amount": 0.005,
@@ -475,7 +431,7 @@
     "/api/swap/execute": {
       "post": {
         "summary": "Execute Swap",
-        "description": "Execute swap transaction via Uniswap MCP (Requires 0.005 USDC payment)",
+        "description": "Fully automated Uniswap swap execution with automatic approval handling, balance validation, and transaction tracking (Requires 0.005 USDC payment)",
         "operationId": "executeSwap",
         "x-payment-required": {
           "amount": 0.005,
@@ -580,10 +536,24 @@
       "ServicePricing": {
         "type": "object",
         "properties": {
-          "portfolio_analysis": { "type": "number", "example": 0.001 },
-          "strategy_recommendations": { "type": "number", "example": 0.002 },
-          "trade_execution": { "type": "number", "example": 0.005 },
-          "automated_trading": { "type": "number", "example": 0.01 }
+          "portfolio_analysis": { "type": "number", "example": 0, "description": "FREE - AI portfolio analysis" },
+          "strategy_recommendations": { "type": "number", "example": 0, "description": "FREE - Investment strategies" },
+          "basic_trade_execution": { "type": "number", "example": 0, "description": "FREE - Basic trading" },
+          "uniswap_swap_quote": { "type": "number", "example": 0.005, "description": "PAID - Advanced Uniswap quotes" },
+          "uniswap_swap_execution": { "type": "number", "example": 0.005, "description": "PAID - Automated swap execution" },
+          "automated_trading": { "type": "number", "example": 0.01, "description": "PAID - Portfolio rebalancing" }
+        }
+      },
+      "AutomatedFeatures": {
+        "type": "object",
+        "properties": {
+          "balance_validation": { "type": "boolean", "example": true },
+          "automatic_approval": { "type": "boolean", "example": true },
+          "transaction_tracking": { "type": "boolean", "example": true },
+          "price_impact_warnings": { "type": "boolean", "example": true },
+          "smart_routing": { "type": "boolean", "example": true },
+          "gas_optimization": { "type": "boolean", "example": true },
+          "multi_chain_support": { "type": "boolean", "example": true }
         }
       }
     }

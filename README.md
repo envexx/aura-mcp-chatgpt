@@ -65,7 +65,7 @@ Aura MCP (Model Context Protocol) Server adalah platform trading AI yang menyedi
 
 ## 📝 Usage Examples
 
-### Get Swap Quote
+### Get Swap Quote (Paid)
 ```json
 {
   "name": "get_swap_quote",
@@ -78,22 +78,78 @@ Aura MCP (Model Context Protocol) Server adalah platform trading AI yang menyedi
   }
 }
 ```
+**Response:**
+```
+✅ Uniswap Swap Quote (Payment Verified)
 
-### Execute Trade
+📊 Trade Details:
+Input: 1.0 NATIVE
+Output: 3000.50 USDC
+Price: 1 NATIVE = 3000.50 USDC
+Price Impact: 0.12%
+Network: ETHEREUM (Chain ID: 1)
+
+🔍 Route Information:
+Direct swap route
+
+⛽ Gas Estimation:
+Estimated Gas: 150,000 units
+
+💰 Minimum Received:
+With 0.5% slippage: 2985.50 USDC
+
+🚀 Ready to Execute?
+Use execute_swap tool with same parameters to proceed.
+```
+
+### Execute Swap (Paid - Fully Automated)
 ```json
 {
-  "name": "execute_trade",
+  "name": "execute_swap",
   "arguments": {
     "wallet_address": "0x...",
-    "from_token": "ETH",
-    "to_token": "USDC",
-    "amount": "0.5",
-    "slippage": 0.5
+    "token_in": "NATIVE",
+    "token_out": "0xA0b86a33E6417c8C4e5F5B0b1e8C5C5F5E5D5C5B",
+    "amount_in": "1.0",
+    "slippage": 0.5,
+    "chain": "ethereum"
   }
 }
 ```
+**Response:**
+```
+🔍 Starting Automated Swap Process
+Network: ETHEREUM (Chain ID: 1)
+Trade: 1.0 NATIVE → USDC
+Slippage: 0.5%
 
-### Portfolio Analysis
+🔍 Step 1: Checking Balance & Allowance
+✅ Balance check passed
+✅ Expected output: 3000.50 USDC
+✅ Price impact: 0.12%
+
+🔍 Step 2: Executing Swap Transaction
+⏳ Processing approval (if needed)...
+⏳ Executing swap transaction...
+
+✅ Swap Completed Successfully!
+Transaction Hash: 0x1234567890abcdef...
+Amount In: 1.0 NATIVE
+Amount Out: 3000.50 USDC
+Gas Used: 147,832
+Network: Ethereum
+
+🔗 Transaction Links:
+Explorer: https://etherscan.io/tx/0x1234...
+
+💰 Next Steps:
+1. ✅ Transaction submitted to blockchain
+2. ⏳ Wait 2-5 minutes for confirmation
+3. 🔍 Check explorer link for status
+4. 💱 Tokens will appear in your wallet after confirmation
+```
+
+### Portfolio Analysis (Free)
 ```json
 {
   "name": "analyze_portfolio",
@@ -105,12 +161,27 @@ Aura MCP (Model Context Protocol) Server adalah platform trading AI yang menyedi
 
 ## 💡 Key Features
 
-- **x402 Micropayments**: Pay-per-use dengan USDC
-- **Multi-Chain Support**: 5 blockchain utama
-- **Smart Routing**: Optimasi harga dengan Uniswap
-- **AI Analysis**: Portfolio insights dengan OpenAI
-- **Automated Trading**: Setup trading rules
-- **Real-time Quotes**: Live price data
+### 🤖 **Fully Automated Execution**
+- **One-Click Swaps**: Single command handles approval + swap
+- **Real-time Balance Checks**: Automatic validation before execution
+- **Smart Error Handling**: Detailed troubleshooting guidance
+- **Transaction Tracking**: Live status updates with explorer links
+
+### 💰 **Smart Payment Model**
+- **Free Core Tools**: Portfolio analysis, strategies, basic trading
+- **Paid Premium Tools**: Advanced Uniswap integration (0.005 USDC)
+- **x402 Micropayments**: Seamless USDC payments
+
+### 🌐 **Multi-Chain Excellence**
+- **5 Major Networks**: Ethereum, Optimism, Polygon, Arbitrum, Base
+- **Smart Routing**: Optimal price discovery across DEXs
+- **Gas Optimization**: Efficient transaction execution
+
+### 📊 **Advanced Analytics**
+- **AI Portfolio Insights**: OpenAI-powered analysis
+- **Price Impact Warnings**: Smart slippage detection
+- **Route Optimization**: Best execution paths
+- **Real-time Quotes**: Live market data
 
 ## 🔒 Security
 

@@ -1,13 +1,123 @@
 {
   "mcpServers": {
     "aura-mcp": {
-      "command": "node",
-      "args": ["mcp-server.js"],
+      "command": "npx",
+      "args": ["tsx", "mcp-server.ts"],
       "env": {
+        "WALLET_PRIVATE_KEY": "your_wallet_private_key_here",
+        "INFURA_KEY": "your_infura_api_key_here",
+        "OPENAI_API_KEY": "your_openai_api_key_here",
         "NEXT_PUBLIC_AURA_API_URL": "https://aura.adex.network/api",
         "X402_PAYMENT_ENDPOINT": "https://x402.adex.network",
         "X402_WALLET_ADDRESS": "0x742d35Cc6634C0532925a3b8D0b4E4f7E1D4D4f4"
       }
     }
+  },
+  "tools": {
+    "core_trading": {
+      "analyze_portfolio": {
+        "description": "AI-powered portfolio analysis with insights",
+        "cost": "FREE",
+        "input": ["wallet_address"],
+        "output": "Detailed portfolio analysis with recommendations"
+      },
+      "get_strategies": {
+        "description": "Get personalized investment strategies",
+        "cost": "FREE",
+        "input": ["wallet_address", "risk_tolerance"],
+        "output": "AI-generated investment strategies"
+      },
+      "execute_trade": {
+        "description": "Execute automated trades with smart routing",
+        "cost": "FREE",
+        "input": ["wallet_address", "from_token", "to_token", "amount", "slippage"],
+        "output": "Transaction details and confirmation"
+      },
+      "setup_automation": {
+        "description": "Setup automated trading rules",
+        "cost": "FREE",
+        "input": ["wallet_address", "automation_type", "parameters"],
+        "output": "Automation rule configuration"
+      }
+    },
+    "uniswap_integration": {
+      "get_swap_quote": {
+        "description": "Get real-time Uniswap swap quotes with detailed analysis",
+        "cost": "0.005 USDC",
+        "input": ["wallet_address", "token_in", "token_out", "amount_in", "chain"],
+        "output": "Comprehensive quote with price impact, route, gas estimation",
+        "features": ["Price impact warnings", "Route optimization", "Gas estimation", "Slippage protection"]
+      },
+      "execute_swap": {
+        "description": "Execute Uniswap swaps with full automation",
+        "cost": "0.005 USDC",
+        "input": ["wallet_address", "token_in", "token_out", "amount_in", "slippage", "chain"],
+        "output": "Complete transaction execution with real-time status",
+        "features": ["Automatic approval handling", "Balance validation", "Transaction tracking", "Error recovery"]
+      },
+      "get_supported_tokens": {
+        "description": "List supported chains and tokens",
+        "cost": "FREE",
+        "input": ["chain"],
+        "output": "Supported chains and common token addresses"
+      }
+    },
+    "payment_system": {
+      "create_payment": {
+        "description": "Create x402 micropayment for services",
+        "cost": "FREE",
+        "input": ["wallet_address", "service"],
+        "output": "Payment QR code and details"
+      },
+      "verify_payment": {
+        "description": "Verify payment status",
+        "cost": "FREE",
+        "input": ["payment_id"],
+        "output": "Payment verification status"
+      }
+    }
+  },
+  "supported_chains": {
+    "ethereum": {
+      "chainId": 1,
+      "name": "Ethereum",
+      "nativeToken": "ETH",
+      "rpcUrl": "https://mainnet.infura.io/v3/{INFURA_KEY}"
+    },
+    "optimism": {
+      "chainId": 10,
+      "name": "Optimism",
+      "nativeToken": "ETH",
+      "rpcUrl": "https://optimism-mainnet.infura.io/v3/{INFURA_KEY}"
+    },
+    "polygon": {
+      "chainId": 137,
+      "name": "Polygon",
+      "nativeToken": "MATIC",
+      "rpcUrl": "https://polygon-mainnet.infura.io/v3/{INFURA_KEY}"
+    },
+    "arbitrum": {
+      "chainId": 42161,
+      "name": "Arbitrum One",
+      "nativeToken": "ETH",
+      "rpcUrl": "https://arbitrum-mainnet.infura.io/v3/{INFURA_KEY}"
+    },
+    "base": {
+      "chainId": 8453,
+      "name": "Base",
+      "nativeToken": "ETH",
+      "rpcUrl": "https://base-mainnet.infura.io/v3/{INFURA_KEY}"
+    }
+  },
+  "features": {
+    "automated_execution": true,
+    "multi_chain_support": true,
+    "smart_routing": true,
+    "price_impact_warnings": true,
+    "gas_optimization": true,
+    "balance_validation": true,
+    "approval_handling": true,
+    "transaction_tracking": true,
+    "x402_micropayments": true
   }
 }
