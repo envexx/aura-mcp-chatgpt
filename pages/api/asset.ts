@@ -21,6 +21,17 @@ export default async function handler(
       return res.status(400).json({ error: 'Valid wallet address is required' });
     }
 
+    // Validate wallet first
+    let walletValidation = null;
+    try {
+      const validationResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/validate-wallet`, {
+        address
+      });
+      walletValidation = validationResponse.data;
+    } catch (error) {
+      console.log('Wallet validation failed, proceeding with AURA data');
+    }
+
     const response = await axios.get(`https://aura.adex.network/api/portfolio/balances?address=${address}`);
     const portfolioData: AuraPortfolioResponse = response.data;
     
@@ -116,10 +127,32 @@ export default async function handler(
       },
     };
 
+    // Add data validation warnings
+    const warnings = [];
+    
+    if (walletValidation) {
+      if (!walletValidation.isValid) {
+        warnings.push('Invalid wallet address format');
+      }
+      if (!walletValidation.hasBalance && formattedResponse.totalPortfolioValue > 1000) {
+        warnings.push('⚠️ Data mismatch detected: Portfolio shows significant value but wallet appears empty on-chain. This might be demo/mock data from AURA API.');
+      }
+      if (!walletValidation.isConnected) {
+        warnings.push('Wallet has no on-chain activity');
+      }
+      if (walletValidation.error) {
+        warnings.push(walletValidation.error);
+      }
+    }
+
     res.status(200).json({
       success: true,
       data: formattedResponse,
       rawData: portfolioData,
+      walletValidation,
+      warnings: warnings.length > 0 ? warnings : undefined,
+      dataSource: 'AURA API',
+      note: warnings.length > 0 ? 'Please verify your wallet connection. The displayed data might be for demonstration purposes.' : undefined
     });
 
   } catch (error: any) {

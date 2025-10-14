@@ -29,16 +29,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Wallet address is required' });
     }
 
-    // 1. Fetch data from AURA API
-    const auraResponse = await axios.get(
-      `${process.env.NEXT_PUBLIC_AURA_API_URL}/portfolio/strategies?address=${address}`
+    // 1. Fetch portfolio data from AURA API
+    const portfolioResponse = await axios.get(
+      `https://aura.adex.network/api/portfolio/balances?address=${address}`
     );
 
-    const auraData = auraResponse.data;
+    // 2. Get strategies from our own API
+    const strategiesResponse = await axios.get(
+      `http://localhost:3001/api/strategies?address=${address}`
+    );
 
-    // 2. Prepare context for ChatGPT
-    const portfolioInfo = JSON.stringify(auraData.portfolio);
-    const strategyInfo = JSON.stringify(auraData.strategies);
+    const portfolioData = portfolioResponse.data;
+    const strategiesData = strategiesResponse.data;
+
+    // 3. Prepare context for ChatGPT
+    const portfolioInfo = JSON.stringify(portfolioData);
+    const strategyInfo = JSON.stringify(strategiesData.data?.strategies || []);
     
     const systemMessage = `You are an expert crypto portfolio advisor specializing in DeFi strategies and blockchain analytics. Your role is to analyze on-chain data and provide personalized financial advice.
 
@@ -77,7 +83,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 4. Send response
     res.status(200).json({
-      aura: auraData,
+      portfolio: portfolioData,
+      strategies: strategiesData,
       chatAnswer: chatResponse.choices[0]?.message?.content || '(No response)'
     });
 

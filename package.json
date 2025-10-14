@@ -19,7 +19,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "viem": "^1.16.5",
-    "wagmi": "^1.4.3"
+    "wagmi": "^1.4.3",
+    "node-cron": "^3.0.3",
+    "redis": "^4.6.10",
+    "web3": "^4.2.2"
   },
   "devDependencies": {
     "@types/node": "^20.8.4",
