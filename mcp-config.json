@@ -27,12 +27,6 @@
         "input": ["wallet_address", "risk_tolerance"],
         "output": "AI-generated investment strategies"
       },
-      "execute_trade": {
-        "description": "Execute automated trades with smart routing",
-        "cost": "FREE",
-        "input": ["wallet_address", "from_token", "to_token", "amount", "slippage"],
-        "output": "Transaction details and confirmation"
-      },
       "setup_automation": {
         "description": "Setup automated trading rules",
         "cost": "FREE",

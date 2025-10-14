@@ -188,8 +188,6 @@ class AuraMCPServer {
           case 'get_strategies':
             return await this.handleGetStrategies(args);
           
-          case 'execute_trade':
-            return await this.handleExecuteTrade(args);
           
           case 'setup_automation':
             return await this.handleSetupAutomation(args);
@@ -272,34 +270,6 @@ ${JSON.stringify(response.data, null, 2)}`,
     }
   }
 
-  private async handleExecuteTrade(args: any) {
-    const { wallet_address, from_token, to_token, amount, slippage } = args;
-
-    // No payment required for basic trade execution
-
-    try {
-      const response = await axios.post('http://localhost:3000/api/trade', {
-        address: wallet_address,
-        fromToken: from_token,
-        toToken: to_token,
-        amount,
-        slippage,
-      });
-      
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `✅ **Trade Executed Successfully** (Free Service)
-
-${JSON.stringify(response.data, null, 2)}`,
-          },
-        ],
-      };
-    } catch (error: any) {
-      throw new Error(`Failed to execute trade: ${error.message}`);
-    }
-  }
 
   private async handleSetupAutomation(args: any) {
     const { wallet_address, automation_type, parameters } = args;
