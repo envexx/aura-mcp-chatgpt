@@ -6,36 +6,148 @@ An advanced Model Context Protocol (MCP) server that integrates AURA API with Ch
 
 ## 🌟 Features
 
-### 🤖 AI-Powered Analytics
-- **Portfolio Analysis**: Deep insights into your crypto holdings
-- **Risk Assessment**: Advanced risk profiling and diversification scoring
-- **Natural Language Interface**: Chat with AI about your portfolio
-- **Strategy Recommendations**: AI-driven investment strategies
+### Aura MCP Server
 
-### 📈 Automated Trading
-- **Smart Order Routing**: Optimized trade execution
-- **Automation Rules**:
-  - Stop Loss
-  - Take Profit
-  - Price Target Monitoring
-- **Multi-token Support**: Trade across various tokens and networks
-- **Slippage Protection**: Built-in mechanisms to prevent excessive slippage
+Aura MCP (Model Context Protocol) Server adalah platform trading AI yang menyediakan analisis portfolio, rekomendasi strategi, dan eksekusi trade dengan sistem micropayment terintegrasi.
 
-### 💳 x402 Integration
-- **Pay-per-use Model**: Micropayments for premium features
-- **Service Pricing**:
-  - Portfolio Analysis: 0.001 USDC
-  - Strategy Recommendations: 0.002 USDC
-  - Trade Execution: 0.005 USDC
-  - Automated Trading: 0.01 USDC
-- **QR Code Payments**: Easy payment flow integration
+## 🚀 Available Tools
 
-### 🌐 Multi-Network Support
-- Ethereum
-- Polygon
-- Optimism
-- Arbitrum
-- Base
+### 💰 Core Trading Tools (FREE)
+
+| Tool | Description | Cost | Input |
+|------|-------------|------|-------|
+| `analyze_portfolio` | AI portfolio analysis | **FREE** | wallet_address |
+| `get_strategies` | Investment strategies | **FREE** | wallet_address, risk_tolerance |
+| `execute_trade` | Execute trades | **FREE** | wallet_address, from_token, to_token, amount |
+| `setup_automation` | Trading automation | **FREE** | wallet_address, automation_type, parameters |
+
+### 🔄 Uniswap Integration Tools (PAID)
+
+| Tool | Description | Cost | Input |
+|------|-------------|------|-------|
+| `get_swap_quote` | Real-time swap quotes | **0.005 USDC** | wallet_address, token_in, token_out, amount_in |
+| `execute_swap` | Execute Uniswap swaps | **0.005 USDC** | wallet_address, token_in, token_out, amount_in |
+| `get_supported_tokens` | List supported tokens | **FREE** | chain (optional) |
+
+### 💳 Payment Tools
+
+| Tool | Description | Cost | Input |
+|------|-------------|------|-------|
+| `create_payment` | Create micropayment | Free | wallet_address, service |
+| `verify_payment` | Verify payment status | Free | payment_id |
+
+## 🌐 Supported Chains
+
+- **Ethereum** (Chain ID: 1)
+- **Optimism** (Chain ID: 10) 
+- **Polygon** (Chain ID: 137)
+- **Arbitrum** (Chain ID: 42161)
+- **Base** (Chain ID: 8453)
+
+## ⚡ Quick Start
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Configure environment** (`.env`):
+   ```env
+   WALLET_PRIVATE_KEY=your_private_key
+   INFURA_KEY=your_infura_key
+   OPENAI_API_KEY=your_openai_key
+   ```
+
+3. **Start server**:
+   ```bash
+   npm run dev
+   ```
+
+## 📝 Usage Examples
+
+### Get Swap Quote
+```json
+{
+  "name": "get_swap_quote",
+  "arguments": {
+    "wallet_address": "0x...",
+    "token_in": "NATIVE",
+    "token_out": "0xA0b86a33E6417c8C4e5F5B0b1e8C5C5F5E5D5C5B",
+    "amount_in": "1.0",
+    "chain": "ethereum"
+  }
+}
+```
+
+### Execute Trade
+```json
+{
+  "name": "execute_trade",
+  "arguments": {
+    "wallet_address": "0x...",
+    "from_token": "ETH",
+    "to_token": "USDC",
+    "amount": "0.5",
+    "slippage": 0.5
+  }
+}
+```
+
+### Portfolio Analysis
+```json
+{
+  "name": "analyze_portfolio",
+  "arguments": {
+    "wallet_address": "0x..."
+  }
+}
+```
+
+## 💡 Key Features
+
+- **x402 Micropayments**: Pay-per-use dengan USDC
+- **Multi-Chain Support**: 5 blockchain utama
+- **Smart Routing**: Optimasi harga dengan Uniswap
+- **AI Analysis**: Portfolio insights dengan OpenAI
+- **Automated Trading**: Setup trading rules
+- **Real-time Quotes**: Live price data
+
+## 🔒 Security
+
+- Private keys di environment variables
+- Payment verification untuk setiap transaksi
+- Balance validation sebelum trade
+- Slippage protection
+- Comprehensive error handling
+
+## 🛠️ Development
+
+```
+aura-mcp/
+├── lib/uniswap-integration.ts   # Uniswap integration
+├── lib/x402-payment.js         # Payment system  
+├── mcp-server.ts              # Main MCP server
+└── pages/api/                 # API endpoints
+```
+
+## 📞 Support
+
+**Common Issues**:
+- Check INFURA_KEY validity
+- Verify wallet balance
+- Ensure payment confirmation
+- Check slippage tolerance
+
+**Environment Setup**:
+- Node.js 18+
+- Valid Ethereum wallet
+- Infura API access
+- USDC for payments
+
+## 🙏 Acknowledgments
+
+- AdEx Network for the AURA API
+- OpenAI for GPT integration capabilities
 
 ## 🚀 Getting Started
 
@@ -47,35 +159,35 @@ An advanced Model Context Protocol (MCP) server that integrates AURA API with Ch
 ### Installation
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone https://github.com/your-username/aura-mcp.git
 cd aura-mcp
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
-3. Create a \`.env\` file in the root directory:
-\`\`\`env
+3. Create a `.env` file in the root directory:
+```env
 OPENAI_API_KEY=your_openai_api_key_here
 NEXT_PUBLIC_AURA_API_URL=https://aura.adex.network/api
-\`\`\`
+```
 
 4. Run the development server:
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## 🔧 API Endpoints
 
 ### Portfolio Analysis
-\`\`\`http
+```http
 GET /api/asset?address={wallet_address}
-\`\`\`
+```
 Returns comprehensive portfolio analysis including:
 - Total portfolio value
 - Token holdings
@@ -83,9 +195,9 @@ Returns comprehensive portfolio analysis including:
 - Diversification score
 
 ### Strategy Recommendations
-\`\`\`http
+```http
 GET /api/strategies?address={wallet_address}
-\`\`\`
+```
 Provides AI-powered strategy recommendations with:
 - Risk-based categorization
 - Expected returns
@@ -93,17 +205,17 @@ Provides AI-powered strategy recommendations with:
 - Platform suggestions
 
 ### AI Chat Interface
-\`\`\`http
+```http
 POST /api/chat
 {
   "address": "wallet_address",
   "message": "user_query"
 }
-\`\`\`
+```
 Interactive AI assistant for portfolio and strategy discussions
 
 ### Automated Trading
-\`\`\`http
+```http
 POST /api/trade
 {
   "address": "wallet_address",
@@ -118,7 +230,7 @@ POST /api/trade
     }
   ]
 }
-\`\`\`
+```
 
 ## 💡 Use Cases
 
@@ -171,17 +283,17 @@ The MCP server is optimized for:
 
 1. Fork the repository
 2. Create your feature branch:
-   \`\`\`bash
+   ```bash
    git checkout -b feature/amazing-feature
-   \`\`\`
+   ```
 3. Commit your changes:
-   \`\`\`bash
+   ```bash
    git commit -m 'Add amazing feature'
-   \`\`\`
+   ```
 4. Push to the branch:
-   \`\`\`bash
+   ```bash
    git push origin feature/amazing-feature
-   \`\`\`
+   ```
 5. Open a Pull Request
 
 ## 📝 License

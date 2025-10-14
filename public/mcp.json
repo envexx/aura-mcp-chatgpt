@@ -3,7 +3,14 @@
   "info": {
     "title": "Aura AI Trading Assistant MCP",
     "description": "Advanced MCP server integrating AURA API with ChatGPT, automated trading, and x402 micropayments",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "x-payment": {
+      "provider": "x402",
+      "endpoint": "https://x402.adex.network",
+      "recipient": "0xd3a12CA02256CD74AD8659974cfF36f62Aa0485c",
+      "currency": "USDC",
+      "network": "ethereum"
+    }
   },
   "servers": [
     {
@@ -14,7 +21,7 @@
     "/api/asset": {
       "get": {
         "summary": "Get Portfolio Analytics",
-        "description": "Get detailed portfolio analytics with AI insights",
+        "description": "Get detailed portfolio analytics with AI insights (Requires 0.001 USDC payment)",
         "operationId": "getPortfolio",
         "parameters": [
           {
@@ -27,13 +34,47 @@
             }
           }
         ],
+        "x-payment-required": {
+          "amount": 0.001,
+          "currency": "USDC",
+          "service": "portfolio_analysis",
+          "description": "Premium AI-powered portfolio analysis"
+        },
+        "responses": {
+          "200": {
+            "description": "Portfolio analysis data"
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "payment": {
+                      "type": "object",
+                      "properties": {
+                        "paymentId": { "type": "string" },
+                        "qrCode": { "type": "string" },
+                        "paymentUrl": { "type": "string" },
+                        "amount": { "type": "number" },
+                        "currency": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "deprecated": false
       }
     },
     "/api/strategies": {
       "get": {
         "summary": "Get Trading Strategies",
-        "description": "Get AI-powered trading strategies and recommendations",
+        "description": "Get AI-powered trading strategies and recommendations (Requires 0.002 USDC payment)",
         "operationId": "getStrategies",
         "parameters": [
           {
@@ -46,6 +87,20 @@
             }
           }
         ],
+        "x-payment-required": {
+          "amount": 0.002,
+          "currency": "USDC",
+          "service": "strategy_recommendations",
+          "description": "AI-powered investment strategy recommendations"
+        },
+        "responses": {
+          "200": {
+            "description": "Strategy recommendations"
+          },
+          "402": {
+            "description": "Payment Required - 0.002 USDC for strategy recommendations"
+          }
+        },
         "deprecated": false
       }
     },
@@ -81,8 +136,14 @@
     "/api/trade": {
       "post": {
         "summary": "Execute Trade",
-        "description": "Execute trades with automation rules and smart order routing",
+        "description": "Execute trades with automation rules and smart order routing (Requires 0.005 USDC payment)",
         "operationId": "executeTrade",
+        "x-payment-required": {
+          "amount": 0.005,
+          "currency": "USDC",
+          "service": "trade_execution",
+          "description": "Automated trade execution with smart routing"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -172,9 +233,359 @@
           }
         }
       }
+    },
+    "/api/payment/create": {
+      "post": {
+        "summary": "Create x402 Payment",
+        "description": "Create a micropayment for premium features",
+        "operationId": "createPayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "walletAddress": {
+                    "type": "string",
+                    "description": "User wallet address"
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": ["portfolio_analysis", "strategy_recommendations", "trade_execution", "automated_trading"],
+                    "description": "Service to pay for"
+                  }
+                },
+                "required": ["walletAddress", "service"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "paymentId": { "type": "string" },
+                    "qrCode": { "type": "string" },
+                    "paymentUrl": { "type": "string" },
+                    "amount": { "type": "number" },
+                    "currency": { "type": "string" },
+                    "expiresAt": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/verify": {
+      "post": {
+        "summary": "Verify x402 Payment",
+        "description": "Verify if a payment has been completed",
+        "operationId": "verifyPayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paymentId": {
+                    "type": "string",
+                    "description": "Payment ID to verify"
+                  }
+                },
+                "required": ["paymentId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isPaid": { "type": "boolean" },
+                    "paymentId": { "type": "string" },
+                    "transactionHash": { "type": "string" },
+                    "paidAt": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rebalance": {
+      "post": {
+        "summary": "Portfolio Rebalancing",
+        "description": "Automated portfolio rebalancing with AI optimization (Requires 0.01 USDC payment)",
+        "operationId": "rebalancePortfolio",
+        "x-payment-required": {
+          "amount": 0.01,
+          "currency": "USDC",
+          "service": "automated_trading",
+          "description": "AI-powered portfolio rebalancing automation"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "description": "Wallet address"
+                  },
+                  "targetAllocations": {
+                    "type": "object",
+                    "description": "Target allocation percentages for each token",
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "slippage": {
+                    "type": "number",
+                    "default": 1.0,
+                    "description": "Allowed slippage percentage"
+                  },
+                  "executeImmediately": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Execute trades immediately or return plan"
+                  }
+                },
+                "required": ["address", "targetAllocations"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rebalancing plan or execution results"
+          },
+          "402": {
+            "description": "Payment Required - 0.01 USDC for automated rebalancing"
+          }
+        }
+      }
+    },
+    "/api/swap/quote": {
+      "post": {
+        "summary": "Get Swap Quote",
+        "description": "Get optimal swap quote from Uniswap MCP with MEV protection (Requires 0.005 USDC payment)",
+        "operationId": "getSwapQuote",
+        "x-payment-required": {
+          "amount": 0.005,
+          "currency": "USDC",
+          "service": "trade_execution",
+          "description": "Premium swap quotes with optimal routing via Uniswap MCP"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "walletAddress": {
+                    "type": "string",
+                    "description": "User wallet address"
+                  },
+                  "tokenIn": {
+                    "type": "string",
+                    "description": "Input token contract address"
+                  },
+                  "tokenOut": {
+                    "type": "string",
+                    "description": "Output token contract address"
+                  },
+                  "amountIn": {
+                    "type": "string",
+                    "description": "Amount of input token to swap"
+                  },
+                  "slippage": {
+                    "type": "number",
+                    "default": 0.5,
+                    "description": "Slippage tolerance percentage"
+                  },
+                  "chain": {
+                    "type": "string",
+                    "default": "ethereum",
+                    "enum": ["ethereum", "polygon", "arbitrum", "optimism", "base"],
+                    "description": "Blockchain network"
+                  }
+                },
+                "required": ["walletAddress", "tokenIn", "tokenOut", "amountIn"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Swap quote with confirmation URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "quote": {
+                      "type": "object",
+                      "properties": {
+                        "amountOut": { "type": "string" },
+                        "amountOutMin": { "type": "string" },
+                        "priceImpact": { "type": "number" },
+                        "gasEstimate": { "type": "string" },
+                        "executionPrice": { "type": "string" }
+                      }
+                    },
+                    "confirmationUrl": { "type": "string" },
+                    "instructions": {
+                      "type": "object",
+                      "properties": {
+                        "nextSteps": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required - 0.005 USDC for swap quotes"
+          }
+        }
+      }
+    },
+    "/api/swap/execute": {
+      "post": {
+        "summary": "Execute Swap",
+        "description": "Execute swap transaction via Uniswap MCP (Requires 0.005 USDC payment)",
+        "operationId": "executeSwap",
+        "x-payment-required": {
+          "amount": 0.005,
+          "currency": "USDC",
+          "service": "trade_execution",
+          "description": "Automated swap execution via Uniswap MCP"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "walletAddress": { "type": "string" },
+                  "tokenIn": { "type": "string" },
+                  "tokenOut": { "type": "string" },
+                  "amountIn": { "type": "string" },
+                  "amountOutMin": { "type": "string" },
+                  "slippage": { "type": "number", "default": 0.5 },
+                  "chain": { "type": "string", "default": "ethereum" }
+                },
+                "required": ["walletAddress", "tokenIn", "tokenOut", "amountIn", "amountOutMin"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Swap execution result with transaction hash"
+          },
+          "402": {
+            "description": "Payment Required - 0.005 USDC for swap execution"
+          }
+        }
+      }
+    },
+    "/api/swap/tokens": {
+      "get": {
+        "summary": "Get Supported Tokens",
+        "description": "Get list of supported tokens for swapping on specified chain",
+        "operationId": "getSupportedTokens",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "description": "Blockchain network",
+            "schema": {
+              "type": "string",
+              "default": "ethereum",
+              "enum": ["ethereum", "polygon", "arbitrum", "optimism", "base"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of supported tokens with metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "tokens": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "address": { "type": "string" },
+                          "symbol": { "type": "string" },
+                          "name": { "type": "string" },
+                          "decimals": { "type": "number" },
+                          "logoURI": { "type": "string" }
+                        }
+                      }
+                    },
+                    "popularTokens": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
-    "schemas": {}
+    "schemas": {
+      "PaymentInfo": {
+        "type": "object",
+        "properties": {
+          "provider": { "type": "string", "example": "x402" },
+          "endpoint": { "type": "string", "example": "https://x402.adex.network" },
+          "recipient": { "type": "string", "example": "0xd3a12CA02256CD74AD8659974cfF36f62Aa0485c" },
+          "currency": { "type": "string", "example": "USDC" },
+          "network": { "type": "string", "example": "ethereum" }
+        }
+      },
+      "ServicePricing": {
+        "type": "object",
+        "properties": {
+          "portfolio_analysis": { "type": "number", "example": 0.001 },
+          "strategy_recommendations": { "type": "number", "example": 0.002 },
+          "trade_execution": { "type": "number", "example": 0.005 },
+          "automated_trading": { "type": "number", "example": 0.01 }
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "aura-mcp": {
+      "command": "node",
+      "args": ["mcp-server.js"],
+      "env": {
+        "NEXT_PUBLIC_AURA_API_URL": "https://aura.adex.network/api",
+        "X402_PAYMENT_ENDPOINT": "https://x402.adex.network",
+        "X402_WALLET_ADDRESS": "0x742d35Cc6634C0532925a3b8D0b4E4f7E1D4D4f4"
+      }
+    }
+  }
+}
