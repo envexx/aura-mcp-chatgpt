@@ -32,8 +32,9 @@ export default async function handler(
     }
 
     // 1. First check token allowance and balance
+    const auraApiUrl = process.env.NEXT_PUBLIC_AURA_API_URL || 'https://aura.adex.network/api';
     const allowanceCheck = await axios.get(
-      `${process.env.NEXT_PUBLIC_AURA_API_URL}/portfolio/balances?address=${address}`
+      `${auraApiUrl}/portfolio/balances?address=${address}`
     );
 
     const hasBalance = allowanceCheck.data.portfolio.some((token: any) => 
@@ -46,7 +47,7 @@ export default async function handler(
 
     // 2. Get trade quote
     const quoteResponse = await axios.get(
-      `${process.env.NEXT_PUBLIC_AURA_API_URL}/trade/quote?fromToken=${fromToken}&toToken=${toToken}&amount=${amount}&slippage=${slippage}`
+      `${auraApiUrl}/trade/quote?fromToken=${fromToken}&toToken=${toToken}&amount=${amount}&slippage=${slippage}`
     );
 
     const quote = quoteResponse.data;
@@ -61,7 +62,7 @@ export default async function handler(
 
     // 4. Execute trade
     const tradeResponse = await axios.post(
-      `${process.env.NEXT_PUBLIC_AURA_API_URL}/trade/execute`,
+      `${auraApiUrl}/trade/execute`,
       {
         address,
         fromToken,

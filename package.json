@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup": "node scripts/setup.js",
+    "config:validate": "node -e \"require('./lib/config').validateConfig()\""
   },
   "dependencies": {
     "@tanstack/react-query": "^4.29.0",

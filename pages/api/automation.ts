@@ -223,7 +223,8 @@ class AutomationEngine {
     try {
       if (rule.actions.executeStrategy) {
         // Execute the associated strategy
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/execute-strategy`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+        const response = await axios.post(`${apiUrl}/api/execute-strategy`, {
           address: rule.userId, // Assuming userId is the wallet address
           strategyId: rule.strategyId,
           autoExecute: true,
@@ -262,11 +263,12 @@ class AutomationEngine {
   private async getMonitoringData(userId: string): Promise<MonitoringData> {
     try {
       // Get portfolio data
-      const portfolioResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/asset?address=${userId}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const portfolioResponse = await axios.get(`${apiUrl}/api/asset?address=${userId}`);
       const portfolio = portfolioResponse.data.data;
 
       // Get strategies (yield opportunities)
-      const strategiesResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/strategies?address=${userId}`);
+      const strategiesResponse = await axios.get(`${apiUrl}/api/strategies?address=${userId}`);
       const strategies = strategiesResponse.data.data.strategies;
 
       // Calculate price changes (simplified)
