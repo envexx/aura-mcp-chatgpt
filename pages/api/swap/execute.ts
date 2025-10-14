@@ -1,6 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createUniswapMCPClient } from '../../../lib/uniswap-mcp-client';
-import { requirePayment } from '../../../lib/x402-payment';
+import { UniswapIntegration } from '../../../lib/uniswap-integration';
+import { X402PaymentManager } from '../../../lib/x402-payment';
+
+// Helper function to get chain ID
+function getChainId(chain: string): number {
+  const chainMap: Record<string, number> = {
+    'ethereum': 1,
+    'optimism': 10,
+    'polygon': 137,
+    'arbitrum': 42161,
+    'base': 8453
+  };
+  return chainMap[chain.toLowerCase()] || 1;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,13 +43,19 @@ export default async function handler(
     }
 
     // 🔐 Check x402 payment requirement for swap execution
-    const paymentCheck = await requirePayment(walletAddress, 'trade_execution');
+    const paymentManager = new X402PaymentManager();
+    const hasPayment = await paymentManager.hasValidPayment(walletAddress, 'trade_execution');
     
-    if (!paymentCheck.authorized) {
+    if (!hasPayment) {
+      const payment = await paymentManager.createPayment({
+        amount: 0.005,
+        service: 'trade_execution',
+        userAddress: walletAddress
+      });
+      
       return res.status(402).json({
         error: 'Payment Required for Swap Execution',
-        message: paymentCheck.message,
-        payment: paymentCheck.paymentResponse,
+        payment,
         service: 'trade_execution',
         amount: 0.005,
         currency: 'USDC'
@@ -45,37 +63,21 @@ export default async function handler(
     }
 
     // ✅ Payment verified, proceed with swap execution
-    const uniswapClient = createUniswapMCPClient(chain);
+    const uniswapIntegration = new UniswapIntegration();
+    const chainId = getChainId(chain);
 
-    // Execute swap through Uniswap MCP
-    const executionResponse = await uniswapClient.executeSwap({
+    // Execute swap through Uniswap integration
+    const executionResponse = await uniswapIntegration.executeSwap(
+      chainId,
       tokenIn,
       tokenOut,
       amountIn,
-      amountOutMin,
-      recipient: walletAddress,
-      deadline,
+      undefined,
+      'exactIn',
       slippage,
-      chain
-    });
-
-    if (!executionResponse.success) {
-      return res.status(400).json({
-        success: false,
-        error: 'Swap execution failed',
-        details: executionResponse.error,
-        fallback: {
-          message: 'Automatic execution failed. You can complete the swap manually:',
-          manualSteps: [
-            '1. Go to https://app.uniswap.org',
-            '2. Connect your wallet',
-            `3. Swap ${amountIn} ${tokenIn} for ${tokenOut}`,
-            `4. Set slippage to ${slippage}%`,
-            '5. Confirm the transaction'
-          ]
-        }
-      });
-    }
+      Math.floor(deadline / 60),
+      process.env.WALLET_PRIVATE_KEY
+    );
 
     // Enhanced response with AURA tracking
     const enhancedResponse = {
@@ -86,17 +88,15 @@ export default async function handler(
         message: '✅ Payment verified - Swap executed successfully'
       },
       execution: {
-        transactionHash: executionResponse.transactionHash,
-        confirmationUrl: executionResponse.confirmationUrl,
-        explorerUrl: executionResponse.explorerUrl,
+        transactionHash: executionResponse.txHash,
         status: 'pending',
         estimatedConfirmation: '2-5 minutes'
       },
       trade: {
         tokenIn,
         tokenOut,
-        amountIn,
-        amountOutMin,
+        amountIn: executionResponse.amountIn,
+        amountOut: executionResponse.outputAmount,
         slippage,
         chain,
         timestamp: new Date().toISOString()
@@ -104,16 +104,15 @@ export default async function handler(
       nextSteps: [
         '✅ Transaction submitted to blockchain',
         '⏳ Waiting for confirmation...',
-        '🔍 Track progress using the explorer URL',
+        '🔍 Track progress using the transaction hash',
         '📱 You will receive confirmation once complete'
       ],
       links: {
-        explorer: executionResponse.explorerUrl,
-        confirmation: executionResponse.confirmationUrl,
-        support: `${process.env.NEXT_PUBLIC_API_URL}/support?tx=${executionResponse.transactionHash}`
+        explorer: `https://etherscan.io/tx/${executionResponse.txHash}`,
+        support: `${process.env.NEXT_PUBLIC_API_URL}/support?tx=${executionResponse.txHash}`
       },
       metadata: {
-        mcpProvider: 'uniswap-trader-mcp',
+        mcpProvider: 'uniswap-integration',
         auraVersion: '1.0.0',
         executedAt: new Date().toISOString()
       }

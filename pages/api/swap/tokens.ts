@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createUniswapMCPClient } from '../../../lib/uniswap-mcp-client';
+import { UniswapIntegration } from '../../../lib/uniswap-integration';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,46 +12,35 @@ export default async function handler(
   try {
     const { chain = 'ethereum' } = req.query;
 
-    const uniswapClient = createUniswapMCPClient(chain as string);
+    const uniswapIntegration = new UniswapIntegration();
 
-    // Get supported tokens from Uniswap MCP
-    const tokensResponse = await uniswapClient.getSupportedTokens(chain as string);
-
-    if (!tokensResponse.success) {
-      // Fallback to common tokens if MCP is unavailable
-      const fallbackTokens = getFallbackTokens(chain as string);
+    // Get supported chains and tokens
+    const supportedChains = uniswapIntegration.getSupportedChains();
+    const fallbackTokens = getFallbackTokens(chain as string);
       
-      return res.status(200).json({
-        success: true,
-        tokens: fallbackTokens,
-        source: 'fallback',
-        message: 'Using cached token list (MCP unavailable)',
-        chain: chain as string
-      });
-    }
-
     // Enhanced response with AURA metadata
     const enhancedResponse = {
       success: true,
-      tokens: tokensResponse.tokens,
-      source: 'uniswap-mcp',
+      tokens: fallbackTokens,
+      supportedChains,
+      source: 'uniswap-integration',
       chain: chain as string,
       metadata: {
-        totalTokens: tokensResponse.tokens?.length || 0,
+        totalTokens: fallbackTokens.length,
         lastUpdated: new Date().toISOString(),
         mcpProvider: 'uniswap-trader-mcp'
       },
       popularTokens: getPopularTokens(chain as string),
       categories: {
-        stablecoins: tokensResponse.tokens?.filter((token: any) => 
+        stablecoins: fallbackTokens.filter((token: any) => 
           ['USDC', 'USDT', 'DAI', 'FRAX'].includes(token.symbol)
-        ) || [],
-        majors: tokensResponse.tokens?.filter((token: any) => 
+        ),
+        majors: fallbackTokens.filter((token: any) => 
           ['ETH', 'WETH', 'BTC', 'WBTC'].includes(token.symbol)
-        ) || [],
-        defi: tokensResponse.tokens?.filter((token: any) => 
+        ),
+        defi: fallbackTokens.filter((token: any) => 
           ['UNI', 'AAVE', 'COMP', 'MKR', 'SNX'].includes(token.symbol)
-        ) || []
+        )
       }
     };
 
